@@ -1,0 +1,33 @@
+﻿@model Museo.ViewModels.CreateProfilesViewModel
+
+<h1>Create Museo Profile</h1>
+
+<form asp-action="CreateProfile" method="post">
+
+    <div>
+        <label asp-for="Title"></label>
+        <input asp-for="Title" />
+        <span asp-validation-for="Title"></span>
+    </div>
+
+    <div>
+        <label asp-for="Theme"></label>
+        <input asp-for="Theme" />
+        <span asp-validation-for="Theme"></span>
+    </div>
+
+    <div>
+        <label asp-for="IsPrivate"></label>
+        <input asp-for="IsPrivate" type="checkbox" />
+        <span asp-validation-for="IsPrivate"></span>
+    </div>
+
+    <button type="submit">Create Profile</button>
+
+</form>
+
+<a asp-action="My">Back</a>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

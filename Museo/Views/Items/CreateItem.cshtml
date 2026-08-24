@@ -1,0 +1,47 @@
+﻿@model Museo.ViewModels.CreatItemVeiwModel
+
+<h1>Create Item</h1>
+
+<form asp-action="CreateItem" method="post">
+
+    <div>
+        <label asp-for="Url"></label>
+        <input asp-for="Url" />
+        <span asp-validation-for="Url"></span>
+    </div>
+
+    <div>
+        <label asp-for="Title"></label>
+        <input asp-for="Title" />
+        <span asp-validation-for="Title"></span>
+    </div>
+
+    <div>
+        <label asp-for="Preview_Image"></label>
+        <input asp-for="Preview_Image" />
+        <span asp-validation-for="Preview_Image"></span>
+    </div>
+
+    <div>
+        <label asp-for="Source"></label>
+        <select asp-for="Source"
+                asp-items="Html.GetEnumSelectList<Museo.Models.source_type>()">
+        </select>
+        <span asp-validation-for="Source"></span>
+    </div>
+
+    <div>
+        <label asp-for="Note"></label>
+        <textarea asp-for="Note"></textarea>
+        <span asp-validation-for="Note"></span>
+    </div>
+
+    <button type="submit">Create</button>
+
+</form>
+
+<a asp-action="Item">Back</a>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

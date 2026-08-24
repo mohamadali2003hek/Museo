@@ -1,0 +1,28 @@
+﻿@model Museo.ViewModels.EditProfileViewModel
+
+@{
+ViewData["Title"] = "Edit Profile";
+}
+
+<h2>Edit Profile</h2>
+
+<form asp-controller="Profile" asp-action="EditProfile" method="post">
+
+```
+<div>
+    <label asp-for="Bio"></label>
+    <textarea asp-for="Bio"></textarea>
+    <span asp-validation-for="Bio"></span>
+</div>
+
+<button type="submit">Save Changes</button>
+```
+
+</form>
+
+<a asp-controller="Profile" asp-action="Profile">
+    Cancel
+</a>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" />
+}

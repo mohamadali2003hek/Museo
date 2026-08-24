@@ -1,0 +1,24 @@
+﻿@model Museo.ViewModels.ProfilesViewModel
+
+<h1>My Museo Profile</h1>
+
+<h2>@Model.Title</h2>
+
+<p>Theme: @Model.Theme</p>
+
+<p>
+    Private:
+    @(Model.IsPrivate ? "Yes" : "No")
+</p>
+
+<a asp-action="Editprofile">
+    Edit Profile
+</a>
+
+<form asp-action="Delete" method="post">
+    <button type="submit">Delete Profile</button>
+</form>
+
+<a asp-controller="Items" asp-action="Item">
+    My Items
+</a>

@@ -1,0 +1,408 @@
+﻿@model List<Museo.ViewModels.ItemViewModel>
+
+<h1>My Museo Board</h1>
+
+<div id="board">
+
+    @foreach (var item in Model)
+    {
+        <div class="item"
+             data-id="@item.Id"
+             style="left:@(item.Pos_x)px; top:@(item.Pos_y)px;">
+
+            <div class="item-content">
+
+                @if (!string.IsNullOrEmpty(item.Preview_Image))
+                {
+                    <img src="@item.Preview_Image"
+                         class="item-image" />
+                }
+
+                <h3>@item.Name</h3>
+
+                @if (!string.IsNullOrEmpty(item.Note))
+                {
+                    <p>@item.Note</p>
+                }
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+<!-- Right Click Menu -->
+
+<div id="context-menu">
+
+    <a id="details-link">
+        Details
+    </a>
+
+    <a id="edit-link">
+        Edit
+    </a>
+
+    <form id="delete-form" method="post">
+
+        <button type="submit">
+            Delete
+        </button>
+
+    </form>
+
+</div>
+
+
+<style>
+
+    /* =========================
+           BOARD
+           ========================= */
+
+    #board {
+        position: relative;
+        width: 100%;
+        height: 700px;
+        border: 2px solid black;
+        overflow: hidden;
+        background: #f5f5f5;
+    }
+
+
+    /* =========================
+           ITEM
+           ========================= */
+
+    .item {
+        position: absolute;
+        width: 180px;
+        min-height: 120px;
+        cursor: grab;
+    }
+
+
+        .item:active {
+            cursor: grabbing;
+        }
+
+
+    /* =========================
+           ITEM CONTENT
+           ========================= */
+
+    .item-content {
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 3px 10px rgba(0,0,0,.15);
+        user-select: text;
+    }
+
+
+    /* =========================
+           IMAGE
+           ========================= */
+
+    .item-image {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 6px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+
+    /* =========================
+           CONTEXT MENU
+           ========================= */
+
+    #context-menu {
+        display: none;
+        position: fixed;
+        background: white;
+        border: 1px solid #ccc;
+        padding: 8px;
+        z-index: 1000;
+        box-shadow: 0 3px 10px rgba(0,0,0,.2);
+        min-width: 120px;
+    }
+
+
+        #context-menu a,
+        #context-menu button {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            border: none;
+            background: white;
+            text-align: left;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+        }
+
+
+            #context-menu a:hover,
+            #context-menu button:hover {
+                background: #eee;
+            }
+
+</style>
+
+
+<script>
+
+    const items = document.querySelectorAll(".item");
+    const board = document.getElementById("board");
+
+    const contextMenu = document.getElementById("context-menu");
+
+    const detailsLink = document.getElementById("details-link");
+    const editLink = document.getElementById("edit-link");
+    const deleteForm = document.getElementById("delete-form");
+
+    let draggedItem = null;
+
+    let offsetX = 0;
+    let offsetY = 0;
+
+
+    // =========================
+    // START DRAG
+    // =========================
+
+    items.forEach(item => {
+
+        item.addEventListener("mousedown", function (e) {
+
+            // فقط Left Click
+            if (e.button !== 0)
+                return;
+
+            draggedItem = item;
+
+            const rect = item.getBoundingClientRect();
+
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+
+        });
+
+
+        // =========================
+        // RIGHT CLICK
+        // =========================
+
+        item.addEventListener("contextmenu", function (e) {
+
+            e.preventDefault();
+
+            const id = item.dataset.id;
+
+
+            // Details
+            detailsLink.href = `/Items/Details/${id}`;
+
+
+            // Edit
+            editLink.href = `/Items/EditItem/${id}`;
+
+
+            // Delete
+            deleteForm.action = `/Items/DeletItem/${id}`;
+
+
+            // Show menu
+            contextMenu.style.display = "block";
+
+            contextMenu.style.left = e.clientX + "px";
+            contextMenu.style.top = e.clientY + "px";
+
+        });
+
+    });
+
+
+    // =========================
+    // MOVE
+    // =========================
+
+    document.addEventListener("mousemove", function (e) {
+
+        if (!draggedItem)
+            return;
+
+
+        const boardRect = board.getBoundingClientRect();
+
+
+        let x =
+            e.clientX -
+            boardRect.left -
+            offsetX;
+
+
+        let y =
+            e.clientY -
+            boardRect.top -
+            offsetY;
+
+
+        // لا تطلع برا الـ board
+
+        const maxX =
+            board.clientWidth -
+            draggedItem.offsetWidth;
+
+
+        const maxY =
+            board.clientHeight -
+            draggedItem.offsetHeight;
+
+
+        x = Math.max(
+            0,
+            Math.min(x, maxX)
+        );
+
+
+        y = Math.max(
+            0,
+            Math.min(y, maxY)
+        );
+
+
+        // تحريك الـ item
+
+        draggedItem.style.left =
+            x + "px";
+
+
+        draggedItem.style.top =
+            y + "px";
+
+    });
+
+
+    // =========================
+    // STOP DRAG + SAVE
+    // =========================
+
+    document.addEventListener("mouseup", async function () {
+
+        if (!draggedItem)
+            return;
+
+
+        const item = draggedItem;
+
+        draggedItem = null;
+
+
+        const x =
+            parseFloat(item.style.left);
+
+
+        const y =
+            parseFloat(item.style.top);
+
+
+        const id =
+            parseInt(item.dataset.id);
+
+
+        console.log("Saving position:");
+
+        console.log("ID:", id);
+
+        console.log("X:", x);
+
+        console.log("Y:", y);
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/Items/MoveItem",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            id: id,
+
+                            posX: x,
+
+                            posY: y
+
+                        })
+
+                    }
+                );
+
+
+            console.log(
+                "MoveItem status:",
+                response.status
+            );
+
+
+            if (!response.ok) {
+
+                console.error(
+                    "❌ Position was NOT saved"
+                );
+
+            }
+            else {
+
+                console.log(
+                    "✅ Position saved"
+                );
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "❌ Error:",
+                error
+            );
+
+        }
+
+    });
+
+
+    // =========================
+    // CLOSE CONTEXT MENU
+    // =========================
+
+    document.addEventListener(
+        "click",
+        function (e) {
+
+            if (!contextMenu.contains(e.target)) {
+
+                contextMenu.style.display =
+                    "none";
+
+            }
+
+        }
+    );
+
+</script>
